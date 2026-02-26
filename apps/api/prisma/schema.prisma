@@ -1,0 +1,140 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  PHOTOGRAPHER
+  ADMIN
+}
+
+enum EventStatus {
+  DRAFT
+  LIVE
+  ARCHIVED
+}
+
+enum PhotoStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum PurchaseStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String?
+  role         UserRole @default(PHOTOGRAPHER)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  events    Event[]
+  purchases Purchase[]
+}
+
+model Event {
+  id         String      @id @default(cuid())
+  ownerId    String
+  name       String
+  slug       String      @unique
+  eventDate  DateTime
+  venue      String?
+  status     EventStatus @default(DRAFT)
+  pricePhoto Int         @default(500)
+  priceAll   Int         @default(2500)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  owner     User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  photos    Photo[]
+  purchases Purchase[]
+
+  @@index([ownerId])
+}
+
+model Photo {
+  id           String      @id @default(cuid())
+  eventId      String
+  storageKey   String      @unique
+  thumbKey     String?
+  width        Int?
+  height       Int?
+  fileSize     Int?
+  mimeType     String
+  isUploaded   Boolean     @default(false)
+  uploadedAt   DateTime?
+  status       PhotoStatus @default(DRAFT)
+  capturedAt   DateTime?
+  publishedAt  DateTime?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  event         Event          @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  faces         FaceEmbedding[]
+  purchaseItems PurchaseItem[]
+
+  @@index([eventId])
+  @@index([eventId, status])
+  @@index([eventId, isUploaded])
+}
+
+model FaceEmbedding {
+  id         String   @id @default(cuid())
+  photoId    String
+  provider   String
+  externalId String
+  confidence Float?
+  createdAt  DateTime @default(now())
+
+  photo Photo @relation(fields: [photoId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, externalId])
+  @@index([photoId])
+}
+
+model Purchase {
+  id                String         @id @default(cuid())
+  eventId           String
+  buyerId           String?
+  buyerEmail        String
+  stripeSessionId   String         @unique
+  stripePaymentId   String?
+  status            PurchaseStatus @default(PENDING)
+  amountTotal       Int
+  currency          String         @default("usd")
+  payoutStatus      String         @default("pending")
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  buyer User? @relation(fields: [buyerId], references: [id], onDelete: SetNull)
+  items PurchaseItem[]
+
+  @@index([eventId])
+  @@index([buyerId])
+}
+
+model PurchaseItem {
+  id         String   @id @default(cuid())
+  purchaseId String
+  photoId    String?
+  itemType   String
+  amount     Int
+  createdAt  DateTime @default(now())
+
+  purchase Purchase @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
+  photo    Photo?   @relation(fields: [photoId], references: [id], onDelete: SetNull)
+
+  @@index([purchaseId])
+  @@index([photoId])
+}

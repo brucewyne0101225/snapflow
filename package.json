@@ -1,0 +1,21 @@
+{
+  "name": "snapflow-ai",
+  "private": true,
+  "packageManager": "pnpm@10.5.2",
+  "scripts": {
+    "dev": "corepack pnpm -r --parallel dev",
+    "lint": "corepack pnpm -r lint",
+    "test": "corepack pnpm -r test",
+    "build": "corepack pnpm -r build",
+    "db:generate": "corepack pnpm --filter @snapflow/api prisma:generate",
+    "db:migrate": "corepack pnpm --filter @snapflow/api prisma:migrate:dev"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.21.0",
+    "eslint": "^9.21.0",
+    "globals": "^15.15.0",
+    "prettier": "^3.5.1",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.25.0"
+  }
+}

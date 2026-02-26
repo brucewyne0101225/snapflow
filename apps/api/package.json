@@ -1,0 +1,42 @@
+{
+  "name": "@snapflow/api",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "lint": "eslint .",
+    "pretest": "prisma generate",
+    "test": "vitest run",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate:dev": "prisma migrate dev",
+    "prisma:migrate:deploy": "prisma migrate deploy"
+  },
+  "dependencies": {
+    "@aws-sdk/client-rekognition": "^3.998.0",
+    "@aws-sdk/client-s3": "^3.998.0",
+    "@aws-sdk/s3-request-presigner": "^3.998.0",
+    "@prisma/client": "^6.4.1",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.0.2",
+    "stripe": "^20.4.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.0.0",
+    "@types/node": "^22.13.10",
+    "@types/supertest": "^7.2.0",
+    "prisma": "^6.4.1",
+    "supertest": "^7.2.2",
+    "tsx": "^4.19.2",
+    "vitest": "^2.1.8"
+  }
+}
